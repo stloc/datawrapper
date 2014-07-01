@@ -135,9 +135,20 @@ abstract class BaseUser extends BaseObject implements Persistent
     protected $collJobsPartial;
 
     /**
+     * @var        PropelObjectCollection|ProductUser[] Collection to store aggregation of ProductUser objects.
+     */
+    protected $collProductUsers;
+    protected $collProductUsersPartial;
+
+    /**
      * @var        PropelObjectCollection|Organization[] Collection to store aggregation of Organization objects.
      */
     protected $collOrganizations;
+
+    /**
+     * @var        PropelObjectCollection|Product[] Collection to store aggregation of Product objects.
+     */
+    protected $collProducts;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -169,6 +180,12 @@ abstract class BaseUser extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $productsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $chartsScheduledForDeletion = null;
 
     /**
@@ -188,6 +205,12 @@ abstract class BaseUser extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $jobsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productUsersScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -804,7 +827,10 @@ abstract class BaseUser extends BaseObject implements Persistent
 
             $this->collJobs = null;
 
+            $this->collProductUsers = null;
+
             $this->collOrganizations = null;
+            $this->collProducts = null;
         } // if (deep)
     }
 
@@ -955,6 +981,32 @@ abstract class BaseUser extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->productsScheduledForDeletion !== null) {
+                if (!$this->productsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->productsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    ProductUserQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProducts() as $product) {
+                    if ($product->isModified()) {
+                        $product->save($con);
+                    }
+                }
+            } elseif ($this->collProducts) {
+                foreach ($this->collProducts as $product) {
+                    if ($product->isModified()) {
+                        $product->save($con);
+                    }
+                }
+            }
+
             if ($this->chartsScheduledForDeletion !== null) {
                 if (!$this->chartsScheduledForDeletion->isEmpty()) {
                     foreach ($this->chartsScheduledForDeletion as $chart) {
@@ -1018,6 +1070,23 @@ abstract class BaseUser extends BaseObject implements Persistent
 
             if ($this->collJobs !== null) {
                 foreach ($this->collJobs as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productUsersScheduledForDeletion !== null) {
+                if (!$this->productUsersScheduledForDeletion->isEmpty()) {
+                    ProductUserQuery::create()
+                        ->filterByPrimaryKeys($this->productUsersScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productUsersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductUsers !== null) {
+                foreach ($this->collProductUsers as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1270,6 +1339,14 @@ abstract class BaseUser extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collProductUsers !== null) {
+                    foreach ($this->collProductUsers as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1399,6 +1476,9 @@ abstract class BaseUser extends BaseObject implements Persistent
             }
             if (null !== $this->collJobs) {
                 $result['Jobs'] = $this->collJobs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductUsers) {
+                $result['ProductUsers'] = $this->collProductUsers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1645,6 +1725,12 @@ abstract class BaseUser extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getProductUsers() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductUser($relObj->copy($deepCopy));
+                }
+            }
+
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1717,6 +1803,9 @@ abstract class BaseUser extends BaseObject implements Persistent
         }
         if ('Job' == $relationName) {
             $this->initJobs();
+        }
+        if ('ProductUser' == $relationName) {
+            $this->initProductUsers();
         }
     }
 
@@ -2693,6 +2782,249 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collProductUsers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return User The current object (for fluent API support)
+     * @see        addProductUsers()
+     */
+    public function clearProductUsers()
+    {
+        $this->collProductUsers = null; // important to set this to null since that means it is uninitialized
+        $this->collProductUsersPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * reset is the collProductUsers collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductUsers($v = true)
+    {
+        $this->collProductUsersPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductUsers collection.
+     *
+     * By default this just sets the collProductUsers collection to an empty array (like clearcollProductUsers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductUsers($overrideExisting = true)
+    {
+        if (null !== $this->collProductUsers && !$overrideExisting) {
+            return;
+        }
+        $this->collProductUsers = new PropelObjectCollection();
+        $this->collProductUsers->setModel('ProductUser');
+    }
+
+    /**
+     * Gets an array of ProductUser objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this User is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductUser[] List of ProductUser objects
+     * @throws PropelException
+     */
+    public function getProductUsers($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductUsersPartial && !$this->isNew();
+        if (null === $this->collProductUsers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductUsers) {
+                // return empty collection
+                $this->initProductUsers();
+            } else {
+                $collProductUsers = ProductUserQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductUsersPartial && count($collProductUsers)) {
+                      $this->initProductUsers(false);
+
+                      foreach($collProductUsers as $obj) {
+                        if (false == $this->collProductUsers->contains($obj)) {
+                          $this->collProductUsers->append($obj);
+                        }
+                      }
+
+                      $this->collProductUsersPartial = true;
+                    }
+
+                    $collProductUsers->getInternalIterator()->rewind();
+                    return $collProductUsers;
+                }
+
+                if($partial && $this->collProductUsers) {
+                    foreach($this->collProductUsers as $obj) {
+                        if($obj->isNew()) {
+                            $collProductUsers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductUsers = $collProductUsers;
+                $this->collProductUsersPartial = false;
+            }
+        }
+
+        return $this->collProductUsers;
+    }
+
+    /**
+     * Sets a collection of ProductUser objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productUsers A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return User The current object (for fluent API support)
+     */
+    public function setProductUsers(PropelCollection $productUsers, PropelPDO $con = null)
+    {
+        $productUsersToDelete = $this->getProductUsers(new Criteria(), $con)->diff($productUsers);
+
+        $this->productUsersScheduledForDeletion = unserialize(serialize($productUsersToDelete));
+
+        foreach ($productUsersToDelete as $productUserRemoved) {
+            $productUserRemoved->setUser(null);
+        }
+
+        $this->collProductUsers = null;
+        foreach ($productUsers as $productUser) {
+            $this->addProductUser($productUser);
+        }
+
+        $this->collProductUsers = $productUsers;
+        $this->collProductUsersPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductUser objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductUser objects.
+     * @throws PropelException
+     */
+    public function countProductUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductUsersPartial && !$this->isNew();
+        if (null === $this->collProductUsers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductUsers) {
+                return 0;
+            }
+
+            if($partial && !$criteria) {
+                return count($this->getProductUsers());
+            }
+            $query = ProductUserQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByUser($this)
+                ->count($con);
+        }
+
+        return count($this->collProductUsers);
+    }
+
+    /**
+     * Method called to associate a ProductUser object to this object
+     * through the ProductUser foreign key attribute.
+     *
+     * @param    ProductUser $l ProductUser
+     * @return User The current object (for fluent API support)
+     */
+    public function addProductUser(ProductUser $l)
+    {
+        if ($this->collProductUsers === null) {
+            $this->initProductUsers();
+            $this->collProductUsersPartial = true;
+        }
+        if (!in_array($l, $this->collProductUsers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductUser($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductUser $productUser The productUser object to add.
+     */
+    protected function doAddProductUser($productUser)
+    {
+        $this->collProductUsers[]= $productUser;
+        $productUser->setUser($this);
+    }
+
+    /**
+     * @param	ProductUser $productUser The productUser object to remove.
+     * @return User The current object (for fluent API support)
+     */
+    public function removeProductUser($productUser)
+    {
+        if ($this->getProductUsers()->contains($productUser)) {
+            $this->collProductUsers->remove($this->collProductUsers->search($productUser));
+            if (null === $this->productUsersScheduledForDeletion) {
+                $this->productUsersScheduledForDeletion = clone $this->collProductUsers;
+                $this->productUsersScheduledForDeletion->clear();
+            }
+            $this->productUsersScheduledForDeletion[]= clone $productUser;
+            $productUser->setUser(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this User is new, it will return
+     * an empty collection; or if this User has previously
+     * been saved, it will retrieve related ProductUsers from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in User.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ProductUser[] List of ProductUser objects
+     */
+    public function getProductUsersJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ProductUserQuery::create(null, $criteria);
+        $query->joinWith('Product', $join_behavior);
+
+        return $this->getProductUsers($query, $con);
+    }
+
+    /**
      * Clears out the collOrganizations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2870,6 +3202,183 @@ abstract class BaseUser extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collProducts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return User The current object (for fluent API support)
+     * @see        addProducts()
+     */
+    public function clearProducts()
+    {
+        $this->collProducts = null; // important to set this to null since that means it is uninitialized
+        $this->collProductsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collProducts collection.
+     *
+     * By default this just sets the collProducts collection to an empty collection (like clearProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProducts()
+    {
+        $this->collProducts = new PropelObjectCollection();
+        $this->collProducts->setModel('Product');
+    }
+
+    /**
+     * Gets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_user cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this User is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Product[] List of Product objects
+     */
+    public function getProducts($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collProducts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProducts) {
+                // return empty collection
+                $this->initProducts();
+            } else {
+                $collProducts = ProductQuery::create(null, $criteria)
+                    ->filterByUser($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProducts;
+                }
+                $this->collProducts = $collProducts;
+            }
+        }
+
+        return $this->collProducts;
+    }
+
+    /**
+     * Sets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_user cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $products A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return User The current object (for fluent API support)
+     */
+    public function setProducts(PropelCollection $products, PropelPDO $con = null)
+    {
+        $this->clearProducts();
+        $currentProducts = $this->getProducts();
+
+        $this->productsScheduledForDeletion = $currentProducts->diff($products);
+
+        foreach ($products as $product) {
+            if (!$currentProducts->contains($product)) {
+                $this->doAddProduct($product);
+            }
+        }
+
+        $this->collProducts = $products;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_user cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Product objects
+     */
+    public function countProducts($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collProducts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProducts) {
+                return 0;
+            } else {
+                $query = ProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByUser($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProducts);
+        }
+    }
+
+    /**
+     * Associate a Product object to this object
+     * through the product_user cross reference table.
+     *
+     * @param  Product $product The ProductUser object to relate
+     * @return User The current object (for fluent API support)
+     */
+    public function addProduct(Product $product)
+    {
+        if ($this->collProducts === null) {
+            $this->initProducts();
+        }
+        if (!$this->collProducts->contains($product)) { // only add it if the **same** object is not already associated
+            $this->doAddProduct($product);
+
+            $this->collProducts[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Product $product The product object to add.
+     */
+    protected function doAddProduct($product)
+    {
+        $productUser = new ProductUser();
+        $productUser->setProduct($product);
+        $this->addProductUser($productUser);
+    }
+
+    /**
+     * Remove a Product object to this object
+     * through the product_user cross reference table.
+     *
+     * @param Product $product The ProductUser object to relate
+     * @return User The current object (for fluent API support)
+     */
+    public function removeProduct(Product $product)
+    {
+        if ($this->getProducts()->contains($product)) {
+            $this->collProducts->remove($this->collProducts->search($product));
+            if (null === $this->productsScheduledForDeletion) {
+                $this->productsScheduledForDeletion = clone $this->collProducts;
+                $this->productsScheduledForDeletion->clear();
+            }
+            $this->productsScheduledForDeletion[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2930,8 +3439,18 @@ abstract class BaseUser extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProductUsers) {
+                foreach ($this->collProductUsers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collOrganizations) {
                 foreach ($this->collOrganizations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProducts) {
+                foreach ($this->collProducts as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2955,10 +3474,18 @@ abstract class BaseUser extends BaseObject implements Persistent
             $this->collJobs->clearIterator();
         }
         $this->collJobs = null;
+        if ($this->collProductUsers instanceof PropelCollection) {
+            $this->collProductUsers->clearIterator();
+        }
+        $this->collProductUsers = null;
         if ($this->collOrganizations instanceof PropelCollection) {
             $this->collOrganizations->clearIterator();
         }
         $this->collOrganizations = null;
+        if ($this->collProducts instanceof PropelCollection) {
+            $this->collProducts->clearIterator();
+        }
+        $this->collProducts = null;
     }
 
     /**

@@ -193,20 +193,6 @@ CREATE TABLE `plugin`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- plugin_organization
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `plugin_organization`;
-
-CREATE TABLE `plugin_organization`
-(
-    `plugin_id` VARCHAR(128) NOT NULL,
-    `organization_id` VARCHAR(128) NOT NULL,
-    PRIMARY KEY (`plugin_id`,`organization_id`),
-    INDEX `plugin_organization_FI_2` (`organization_id`)
-) ENGINE=MyISAM;
-
--- ---------------------------------------------------------------------
 -- plugin_data
 -- ---------------------------------------------------------------------
 
@@ -225,6 +211,65 @@ CREATE TABLE `plugin_data`
         FOREIGN KEY (`plugin_id`)
         REFERENCES `plugin` (`id`)
 ) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- product
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product`;
+
+CREATE TABLE `product`
+(
+    `id` VARCHAR(128) NOT NULL,
+    `name` VARCHAR(512) NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `deleted` TINYINT(1) DEFAULT 0,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- product_plugin
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_plugin`;
+
+CREATE TABLE `product_plugin`
+(
+    `product_id` VARCHAR(128) NOT NULL,
+    `plugin_id` VARCHAR(128) NOT NULL,
+    PRIMARY KEY (`product_id`,`plugin_id`),
+    INDEX `product_plugin_FI_2` (`plugin_id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- product_user
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_user`;
+
+CREATE TABLE `product_user`
+(
+    `product_id` VARCHAR(128) NOT NULL,
+    `user_id` INTEGER NOT NULL,
+    `expires_at` DATE,
+    PRIMARY KEY (`product_id`,`user_id`),
+    INDEX `product_user_FI_2` (`user_id`)
+) ENGINE=MyISAM;
+
+-- ---------------------------------------------------------------------
+-- product_organization
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_organization`;
+
+CREATE TABLE `product_organization`
+(
+    `product_id` VARCHAR(128) NOT NULL,
+    `organization_id` INTEGER NOT NULL,
+    `expires_at` DATE,
+    PRIMARY KEY (`product_id`,`organization_id`),
+    INDEX `product_organization_FI_2` (`organization_id`)
+) ENGINE=MyISAM;
 
 # This restores the fkey checks, after having unset them earlier
 SET FOREIGN_KEY_CHECKS = 1;

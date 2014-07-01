@@ -3,7 +3,7 @@
 
 
 /**
- * This class defines the structure of the 'organization' table.
+ * This class defines the structure of the 'product' table.
  *
  *
  *
@@ -14,13 +14,13 @@
  *
  * @package    propel.generator.datawrapper.map
  */
-class OrganizationTableMap extends TableMap
+class ProductTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'datawrapper.map.OrganizationTableMap';
+    const CLASS_NAME = 'datawrapper.map.ProductTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -32,9 +32,9 @@ class OrganizationTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('organization');
-        $this->setPhpName('Organization');
-        $this->setClassname('Organization');
+        $this->setName('product');
+        $this->setPhpName('Product');
+        $this->setClassname('Product');
         $this->setPackage('datawrapper');
         $this->setUseIdGenerator(false);
         // columns
@@ -50,11 +50,12 @@ class OrganizationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Chart', 'Chart', RelationMap::ONE_TO_MANY, array('id' => 'organization_id', ), null, null, 'Charts');
-        $this->addRelation('UserOrganization', 'UserOrganization', RelationMap::ONE_TO_MANY, array('id' => 'organization_id', ), null, null, 'UserOrganizations');
-        $this->addRelation('ProductOrganization', 'ProductOrganization', RelationMap::ONE_TO_MANY, array('id' => 'organization_id', ), null, null, 'ProductOrganizations');
+        $this->addRelation('ProductPlugin', 'ProductPlugin', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), null, null, 'ProductPlugins');
+        $this->addRelation('ProductUser', 'ProductUser', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), null, null, 'ProductUsers');
+        $this->addRelation('ProductOrganization', 'ProductOrganization', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), null, null, 'ProductOrganizations');
+        $this->addRelation('Plugin', 'Plugin', RelationMap::MANY_TO_MANY, array(), null, null, 'Plugins');
         $this->addRelation('User', 'User', RelationMap::MANY_TO_MANY, array(), null, null, 'Users');
-        $this->addRelation('Product', 'Product', RelationMap::MANY_TO_MANY, array(), null, null, 'Products');
+        $this->addRelation('Organization', 'Organization', RelationMap::MANY_TO_MANY, array(), null, null, 'Organizations');
     } // buildRelations()
 
-} // OrganizationTableMap
+} // ProductTableMap

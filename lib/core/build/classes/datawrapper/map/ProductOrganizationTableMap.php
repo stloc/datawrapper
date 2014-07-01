@@ -3,7 +3,7 @@
 
 
 /**
- * This class defines the structure of the 'plugin' table.
+ * This class defines the structure of the 'product_organization' table.
  *
  *
  *
@@ -14,13 +14,13 @@
  *
  * @package    propel.generator.datawrapper.map
  */
-class PluginTableMap extends TableMap
+class ProductOrganizationTableMap extends TableMap
 {
 
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'datawrapper.map.PluginTableMap';
+    const CLASS_NAME = 'datawrapper.map.ProductOrganizationTableMap';
 
     /**
      * Initialize the table attributes, columns and validators
@@ -32,16 +32,16 @@ class PluginTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('plugin');
-        $this->setPhpName('Plugin');
-        $this->setClassname('Plugin');
+        $this->setName('product_organization');
+        $this->setPhpName('ProductOrganization');
+        $this->setClassname('ProductOrganization');
         $this->setPackage('datawrapper');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addPrimaryKey('id', 'Id', 'VARCHAR', true, 128, null);
-        $this->addColumn('installed_at', 'InstalledAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('enabled', 'Enabled', 'BOOLEAN', false, 1, false);
-        $this->addColumn('is_private', 'IsPrivate', 'BOOLEAN', false, 1, false);
+        $this->addForeignPrimaryKey('product_id', 'ProductId', 'VARCHAR' , 'product', 'id', true, 128, null);
+        $this->addForeignPrimaryKey('organization_id', 'OrganizationId', 'INTEGER' , 'organization', 'id', true, null, null);
+        $this->addColumn('expires_at', 'ExpiresAt', 'DATE', false, null, null);
         // validators
     } // initialize()
 
@@ -50,9 +50,8 @@ class PluginTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('PluginData', 'PluginData', RelationMap::ONE_TO_MANY, array('id' => 'plugin_id', ), null, null, 'PluginDatas');
-        $this->addRelation('ProductPlugin', 'ProductPlugin', RelationMap::ONE_TO_MANY, array('id' => 'plugin_id', ), null, null, 'ProductPlugins');
-        $this->addRelation('Product', 'Product', RelationMap::MANY_TO_MANY, array(), null, null, 'Products');
+        $this->addRelation('Product', 'Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), null, null);
+        $this->addRelation('Organization', 'Organization', RelationMap::MANY_TO_ONE, array('organization_id' => 'id', ), null, null);
     } // buildRelations()
 
-} // PluginTableMap
+} // ProductOrganizationTableMap

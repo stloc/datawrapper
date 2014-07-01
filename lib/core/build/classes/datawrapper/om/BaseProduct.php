@@ -2,24 +2,24 @@
 
 
 /**
- * Base class that represents a row from the 'organization' table.
+ * Base class that represents a row from the 'product' table.
  *
  *
  *
  * @package    propel.generator.datawrapper.om
  */
-abstract class BaseOrganization extends BaseObject implements Persistent
+abstract class BaseProduct extends BaseObject implements Persistent
 {
     /**
      * Peer class name
      */
-    const PEER = 'OrganizationPeer';
+    const PEER = 'ProductPeer';
 
     /**
      * The Peer class.
      * Instance provides a convenient way of calling static methods on a class
      * that calling code may not be able to identify.
-     * @var        OrganizationPeer
+     * @var        ProductPeer
      */
     protected static $peer;
 
@@ -55,16 +55,16 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     protected $deleted;
 
     /**
-     * @var        PropelObjectCollection|Chart[] Collection to store aggregation of Chart objects.
+     * @var        PropelObjectCollection|ProductPlugin[] Collection to store aggregation of ProductPlugin objects.
      */
-    protected $collCharts;
-    protected $collChartsPartial;
+    protected $collProductPlugins;
+    protected $collProductPluginsPartial;
 
     /**
-     * @var        PropelObjectCollection|UserOrganization[] Collection to store aggregation of UserOrganization objects.
+     * @var        PropelObjectCollection|ProductUser[] Collection to store aggregation of ProductUser objects.
      */
-    protected $collUserOrganizations;
-    protected $collUserOrganizationsPartial;
+    protected $collProductUsers;
+    protected $collProductUsersPartial;
 
     /**
      * @var        PropelObjectCollection|ProductOrganization[] Collection to store aggregation of ProductOrganization objects.
@@ -73,14 +73,19 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     protected $collProductOrganizationsPartial;
 
     /**
+     * @var        PropelObjectCollection|Plugin[] Collection to store aggregation of Plugin objects.
+     */
+    protected $collPlugins;
+
+    /**
      * @var        PropelObjectCollection|User[] Collection to store aggregation of User objects.
      */
     protected $collUsers;
 
     /**
-     * @var        PropelObjectCollection|Product[] Collection to store aggregation of Product objects.
+     * @var        PropelObjectCollection|Organization[] Collection to store aggregation of Organization objects.
      */
-    protected $collProducts;
+    protected $collOrganizations;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -106,25 +111,31 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $pluginsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $usersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $productsScheduledForDeletion = null;
+    protected $organizationsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $chartsScheduledForDeletion = null;
+    protected $productPluginsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $userOrganizationsScheduledForDeletion = null;
+    protected $productUsersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -144,7 +155,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     }
 
     /**
-     * Initializes internal state of BaseOrganization object.
+     * Initializes internal state of BaseProduct object.
      * @see        applyDefaults()
      */
     public function __construct()
@@ -227,7 +238,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * Set the value of [id] column.
      *
      * @param string $v new value
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -237,7 +248,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = OrganizationPeer::ID;
+            $this->modifiedColumns[] = ProductPeer::ID;
         }
 
 
@@ -248,7 +259,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * Set the value of [name] column.
      *
      * @param string $v new value
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setName($v)
     {
@@ -258,7 +269,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
         if ($this->name !== $v) {
             $this->name = $v;
-            $this->modifiedColumns[] = OrganizationPeer::NAME;
+            $this->modifiedColumns[] = ProductPeer::NAME;
         }
 
 
@@ -270,7 +281,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -280,7 +291,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
             if ($currentDateAsString !== $newDateAsString) {
                 $this->created_at = $newDateAsString;
-                $this->modifiedColumns[] = OrganizationPeer::CREATED_AT;
+                $this->modifiedColumns[] = ProductPeer::CREATED_AT;
             }
         } // if either are not null
 
@@ -296,7 +307,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * Check on string values is case insensitive (so 'FaLsE' is seen as 'false').
      *
      * @param boolean|integer|string $v The new value
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setDeleted($v)
     {
@@ -310,7 +321,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
         if ($this->deleted !== $v) {
             $this->deleted = $v;
-            $this->modifiedColumns[] = OrganizationPeer::DELETED;
+            $this->modifiedColumns[] = ProductPeer::DELETED;
         }
 
 
@@ -365,10 +376,10 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
             $this->postHydrate($row, $startcol, $rehydrate);
-            return $startcol + 4; // 4 = OrganizationPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = ProductPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating Organization object", $e);
+            throw new PropelException("Error populating Product object", $e);
         }
     }
 
@@ -411,13 +422,13 @@ abstract class BaseOrganization extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(OrganizationPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $stmt = OrganizationPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
+        $stmt = ProductPeer::doSelectStmt($this->buildPkeyCriteria(), $con);
         $row = $stmt->fetch(PDO::FETCH_NUM);
         $stmt->closeCursor();
         if (!$row) {
@@ -427,14 +438,15 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collCharts = null;
+            $this->collProductPlugins = null;
 
-            $this->collUserOrganizations = null;
+            $this->collProductUsers = null;
 
             $this->collProductOrganizations = null;
 
+            $this->collPlugins = null;
             $this->collUsers = null;
-            $this->collProducts = null;
+            $this->collOrganizations = null;
         } // if (deep)
     }
 
@@ -455,12 +467,12 @@ abstract class BaseOrganization extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(OrganizationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = OrganizationQuery::create()
+            $deleteQuery = ProductQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -498,7 +510,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(OrganizationPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         $con->beginTransaction();
@@ -518,7 +530,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                OrganizationPeer::addInstanceToPool($this);
+                ProductPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -559,14 +571,40 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->pluginsScheduledForDeletion !== null) {
+                if (!$this->pluginsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->pluginsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    ProductPluginQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->pluginsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getPlugins() as $plugin) {
+                    if ($plugin->isModified()) {
+                        $plugin->save($con);
+                    }
+                }
+            } elseif ($this->collPlugins) {
+                foreach ($this->collPlugins as $plugin) {
+                    if ($plugin->isModified()) {
+                        $plugin->save($con);
+                    }
+                }
+            }
+
             if ($this->usersScheduledForDeletion !== null) {
                 if (!$this->usersScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
                     foreach ($this->usersScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
+                        $pks[] = array($pk, $remotePk);
                     }
-                    UserOrganizationQuery::create()
+                    ProductUserQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
                     $this->usersScheduledForDeletion = null;
@@ -585,61 +623,60 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
+            if ($this->organizationsScheduledForDeletion !== null) {
+                if (!$this->organizationsScheduledForDeletion->isEmpty()) {
                     $pks = array();
                     $pk = $this->getPrimaryKey();
-                    foreach ($this->productsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
-                        $pks[] = array($remotePk, $pk);
+                    foreach ($this->organizationsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
                     }
                     ProductOrganizationQuery::create()
                         ->filterByPrimaryKeys($pks)
                         ->delete($con);
-                    $this->productsScheduledForDeletion = null;
+                    $this->organizationsScheduledForDeletion = null;
                 }
 
-                foreach ($this->getProducts() as $product) {
-                    if ($product->isModified()) {
-                        $product->save($con);
+                foreach ($this->getOrganizations() as $organization) {
+                    if ($organization->isModified()) {
+                        $organization->save($con);
                     }
                 }
-            } elseif ($this->collProducts) {
-                foreach ($this->collProducts as $product) {
-                    if ($product->isModified()) {
-                        $product->save($con);
+            } elseif ($this->collOrganizations) {
+                foreach ($this->collOrganizations as $organization) {
+                    if ($organization->isModified()) {
+                        $organization->save($con);
                     }
                 }
             }
 
-            if ($this->chartsScheduledForDeletion !== null) {
-                if (!$this->chartsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->chartsScheduledForDeletion as $chart) {
-                        // need to save related object because we set the relation to null
-                        $chart->save($con);
-                    }
-                    $this->chartsScheduledForDeletion = null;
+            if ($this->productPluginsScheduledForDeletion !== null) {
+                if (!$this->productPluginsScheduledForDeletion->isEmpty()) {
+                    ProductPluginQuery::create()
+                        ->filterByPrimaryKeys($this->productPluginsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productPluginsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collCharts !== null) {
-                foreach ($this->collCharts as $referrerFK) {
+            if ($this->collProductPlugins !== null) {
+                foreach ($this->collProductPlugins as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
             }
 
-            if ($this->userOrganizationsScheduledForDeletion !== null) {
-                if (!$this->userOrganizationsScheduledForDeletion->isEmpty()) {
-                    UserOrganizationQuery::create()
-                        ->filterByPrimaryKeys($this->userOrganizationsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->productUsersScheduledForDeletion !== null) {
+                if (!$this->productUsersScheduledForDeletion->isEmpty()) {
+                    ProductUserQuery::create()
+                        ->filterByPrimaryKeys($this->productUsersScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->userOrganizationsScheduledForDeletion = null;
+                    $this->productUsersScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collUserOrganizations !== null) {
-                foreach ($this->collUserOrganizations as $referrerFK) {
+            if ($this->collProductUsers !== null) {
+                foreach ($this->collProductUsers as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -685,21 +722,21 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(OrganizationPeer::ID)) {
+        if ($this->isColumnModified(ProductPeer::ID)) {
             $modifiedColumns[':p' . $index++]  = '`id`';
         }
-        if ($this->isColumnModified(OrganizationPeer::NAME)) {
+        if ($this->isColumnModified(ProductPeer::NAME)) {
             $modifiedColumns[':p' . $index++]  = '`name`';
         }
-        if ($this->isColumnModified(OrganizationPeer::CREATED_AT)) {
+        if ($this->isColumnModified(ProductPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
-        if ($this->isColumnModified(OrganizationPeer::DELETED)) {
+        if ($this->isColumnModified(ProductPeer::DELETED)) {
             $modifiedColumns[':p' . $index++]  = '`deleted`';
         }
 
         $sql = sprintf(
-            'INSERT INTO `organization` (%s) VALUES (%s)',
+            'INSERT INTO `product` (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -807,21 +844,21 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            if (($retval = OrganizationPeer::doValidate($this, $columns)) !== true) {
+            if (($retval = ProductPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
 
-                if ($this->collCharts !== null) {
-                    foreach ($this->collCharts as $referrerFK) {
+                if ($this->collProductPlugins !== null) {
+                    foreach ($this->collProductPlugins as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collUserOrganizations !== null) {
-                    foreach ($this->collUserOrganizations as $referrerFK) {
+                if ($this->collProductUsers !== null) {
+                    foreach ($this->collProductUsers as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -855,7 +892,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function getByName($name, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = OrganizationPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = ProductPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -906,11 +943,11 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Organization'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['Product'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Organization'][$this->getPrimaryKey()] = true;
-        $keys = OrganizationPeer::getFieldNames($keyType);
+        $alreadyDumpedObjects['Product'][$this->getPrimaryKey()] = true;
+        $keys = ProductPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
@@ -918,11 +955,11 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             $keys[3] => $this->getDeleted(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collCharts) {
-                $result['Charts'] = $this->collCharts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductPlugins) {
+                $result['ProductPlugins'] = $this->collProductPlugins->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collUserOrganizations) {
-                $result['UserOrganizations'] = $this->collUserOrganizations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductUsers) {
+                $result['ProductUsers'] = $this->collProductUsers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collProductOrganizations) {
                 $result['ProductOrganizations'] = $this->collProductOrganizations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -945,7 +982,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function setByName($name, $value, $type = BasePeer::TYPE_PHPNAME)
     {
-        $pos = OrganizationPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
+        $pos = ProductPeer::translateFieldName($name, $type, BasePeer::TYPE_NUM);
 
         $this->setByPosition($pos, $value);
     }
@@ -995,7 +1032,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function fromArray($arr, $keyType = BasePeer::TYPE_PHPNAME)
     {
-        $keys = OrganizationPeer::getFieldNames($keyType);
+        $keys = ProductPeer::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
@@ -1010,12 +1047,12 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(OrganizationPeer::DATABASE_NAME);
+        $criteria = new Criteria(ProductPeer::DATABASE_NAME);
 
-        if ($this->isColumnModified(OrganizationPeer::ID)) $criteria->add(OrganizationPeer::ID, $this->id);
-        if ($this->isColumnModified(OrganizationPeer::NAME)) $criteria->add(OrganizationPeer::NAME, $this->name);
-        if ($this->isColumnModified(OrganizationPeer::CREATED_AT)) $criteria->add(OrganizationPeer::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(OrganizationPeer::DELETED)) $criteria->add(OrganizationPeer::DELETED, $this->deleted);
+        if ($this->isColumnModified(ProductPeer::ID)) $criteria->add(ProductPeer::ID, $this->id);
+        if ($this->isColumnModified(ProductPeer::NAME)) $criteria->add(ProductPeer::NAME, $this->name);
+        if ($this->isColumnModified(ProductPeer::CREATED_AT)) $criteria->add(ProductPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProductPeer::DELETED)) $criteria->add(ProductPeer::DELETED, $this->deleted);
 
         return $criteria;
     }
@@ -1030,8 +1067,8 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(OrganizationPeer::DATABASE_NAME);
-        $criteria->add(OrganizationPeer::ID, $this->id);
+        $criteria = new Criteria(ProductPeer::DATABASE_NAME);
+        $criteria->add(ProductPeer::ID, $this->id);
 
         return $criteria;
     }
@@ -1072,7 +1109,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param object $copyObj An object of Organization (or compatible) type.
+     * @param object $copyObj An object of Product (or compatible) type.
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1090,15 +1127,15 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getCharts() as $relObj) {
+            foreach ($this->getProductPlugins() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addChart($relObj->copy($deepCopy));
+                    $copyObj->addProductPlugin($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getUserOrganizations() as $relObj) {
+            foreach ($this->getProductUsers() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addUserOrganization($relObj->copy($deepCopy));
+                    $copyObj->addProductUser($relObj->copy($deepCopy));
                 }
             }
 
@@ -1127,7 +1164,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * objects.
      *
      * @param boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return Organization Clone of current object.
+     * @return Product Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1147,12 +1184,12 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * same instance for all member of this class. The method could therefore
      * be static, but this would prevent one from overriding the behavior.
      *
-     * @return OrganizationPeer
+     * @return ProductPeer
      */
     public function getPeer()
     {
         if (self::$peer === null) {
-            self::$peer = new OrganizationPeer();
+            self::$peer = new ProductPeer();
         }
 
         return self::$peer;
@@ -1169,11 +1206,11 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('Chart' == $relationName) {
-            $this->initCharts();
+        if ('ProductPlugin' == $relationName) {
+            $this->initProductPlugins();
         }
-        if ('UserOrganization' == $relationName) {
-            $this->initUserOrganizations();
+        if ('ProductUser' == $relationName) {
+            $this->initProductUsers();
         }
         if ('ProductOrganization' == $relationName) {
             $this->initProductOrganizations();
@@ -1181,36 +1218,36 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collCharts collection
+     * Clears out the collProductPlugins collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Organization The current object (for fluent API support)
-     * @see        addCharts()
+     * @return Product The current object (for fluent API support)
+     * @see        addProductPlugins()
      */
-    public function clearCharts()
+    public function clearProductPlugins()
     {
-        $this->collCharts = null; // important to set this to null since that means it is uninitialized
-        $this->collChartsPartial = null;
+        $this->collProductPlugins = null; // important to set this to null since that means it is uninitialized
+        $this->collProductPluginsPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collCharts collection loaded partially
+     * reset is the collProductPlugins collection loaded partially
      *
      * @return void
      */
-    public function resetPartialCharts($v = true)
+    public function resetPartialProductPlugins($v = true)
     {
-        $this->collChartsPartial = $v;
+        $this->collProductPluginsPartial = $v;
     }
 
     /**
-     * Initializes the collCharts collection.
+     * Initializes the collProductPlugins collection.
      *
-     * By default this just sets the collCharts collection to an empty array (like clearcollCharts());
+     * By default this just sets the collProductPlugins collection to an empty array (like clearcollProductPlugins());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1219,180 +1256,180 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initCharts($overrideExisting = true)
+    public function initProductPlugins($overrideExisting = true)
     {
-        if (null !== $this->collCharts && !$overrideExisting) {
+        if (null !== $this->collProductPlugins && !$overrideExisting) {
             return;
         }
-        $this->collCharts = new PropelObjectCollection();
-        $this->collCharts->setModel('Chart');
+        $this->collProductPlugins = new PropelObjectCollection();
+        $this->collProductPlugins->setModel('ProductPlugin');
     }
 
     /**
-     * Gets an array of Chart objects which contain a foreign key that references this object.
+     * Gets an array of ProductPlugin objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Organization is new, it will return
+     * If this Product is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Chart[] List of Chart objects
+     * @return PropelObjectCollection|ProductPlugin[] List of ProductPlugin objects
      * @throws PropelException
      */
-    public function getCharts($criteria = null, PropelPDO $con = null)
+    public function getProductPlugins($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collChartsPartial && !$this->isNew();
-        if (null === $this->collCharts || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCharts) {
+        $partial = $this->collProductPluginsPartial && !$this->isNew();
+        if (null === $this->collProductPlugins || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductPlugins) {
                 // return empty collection
-                $this->initCharts();
+                $this->initProductPlugins();
             } else {
-                $collCharts = ChartQuery::create(null, $criteria)
-                    ->filterByOrganization($this)
+                $collProductPlugins = ProductPluginQuery::create(null, $criteria)
+                    ->filterByProduct($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collChartsPartial && count($collCharts)) {
-                      $this->initCharts(false);
+                    if (false !== $this->collProductPluginsPartial && count($collProductPlugins)) {
+                      $this->initProductPlugins(false);
 
-                      foreach($collCharts as $obj) {
-                        if (false == $this->collCharts->contains($obj)) {
-                          $this->collCharts->append($obj);
+                      foreach($collProductPlugins as $obj) {
+                        if (false == $this->collProductPlugins->contains($obj)) {
+                          $this->collProductPlugins->append($obj);
                         }
                       }
 
-                      $this->collChartsPartial = true;
+                      $this->collProductPluginsPartial = true;
                     }
 
-                    $collCharts->getInternalIterator()->rewind();
-                    return $collCharts;
+                    $collProductPlugins->getInternalIterator()->rewind();
+                    return $collProductPlugins;
                 }
 
-                if($partial && $this->collCharts) {
-                    foreach($this->collCharts as $obj) {
+                if($partial && $this->collProductPlugins) {
+                    foreach($this->collProductPlugins as $obj) {
                         if($obj->isNew()) {
-                            $collCharts[] = $obj;
+                            $collProductPlugins[] = $obj;
                         }
                     }
                 }
 
-                $this->collCharts = $collCharts;
-                $this->collChartsPartial = false;
+                $this->collProductPlugins = $collProductPlugins;
+                $this->collProductPluginsPartial = false;
             }
         }
 
-        return $this->collCharts;
+        return $this->collProductPlugins;
     }
 
     /**
-     * Sets a collection of Chart objects related by a one-to-many relationship
+     * Sets a collection of ProductPlugin objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $charts A Propel collection.
+     * @param PropelCollection $productPlugins A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
-    public function setCharts(PropelCollection $charts, PropelPDO $con = null)
+    public function setProductPlugins(PropelCollection $productPlugins, PropelPDO $con = null)
     {
-        $chartsToDelete = $this->getCharts(new Criteria(), $con)->diff($charts);
+        $productPluginsToDelete = $this->getProductPlugins(new Criteria(), $con)->diff($productPlugins);
 
-        $this->chartsScheduledForDeletion = unserialize(serialize($chartsToDelete));
+        $this->productPluginsScheduledForDeletion = unserialize(serialize($productPluginsToDelete));
 
-        foreach ($chartsToDelete as $chartRemoved) {
-            $chartRemoved->setOrganization(null);
+        foreach ($productPluginsToDelete as $productPluginRemoved) {
+            $productPluginRemoved->setProduct(null);
         }
 
-        $this->collCharts = null;
-        foreach ($charts as $chart) {
-            $this->addChart($chart);
+        $this->collProductPlugins = null;
+        foreach ($productPlugins as $productPlugin) {
+            $this->addProductPlugin($productPlugin);
         }
 
-        $this->collCharts = $charts;
-        $this->collChartsPartial = false;
+        $this->collProductPlugins = $productPlugins;
+        $this->collProductPluginsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Chart objects.
+     * Returns the number of related ProductPlugin objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related Chart objects.
+     * @return int             Count of related ProductPlugin objects.
      * @throws PropelException
      */
-    public function countCharts(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countProductPlugins(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collChartsPartial && !$this->isNew();
-        if (null === $this->collCharts || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCharts) {
+        $partial = $this->collProductPluginsPartial && !$this->isNew();
+        if (null === $this->collProductPlugins || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductPlugins) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getCharts());
+                return count($this->getProductPlugins());
             }
-            $query = ChartQuery::create(null, $criteria);
+            $query = ProductPluginQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByOrganization($this)
+                ->filterByProduct($this)
                 ->count($con);
         }
 
-        return count($this->collCharts);
+        return count($this->collProductPlugins);
     }
 
     /**
-     * Method called to associate a Chart object to this object
-     * through the Chart foreign key attribute.
+     * Method called to associate a ProductPlugin object to this object
+     * through the ProductPlugin foreign key attribute.
      *
-     * @param    Chart $l Chart
-     * @return Organization The current object (for fluent API support)
+     * @param    ProductPlugin $l ProductPlugin
+     * @return Product The current object (for fluent API support)
      */
-    public function addChart(Chart $l)
+    public function addProductPlugin(ProductPlugin $l)
     {
-        if ($this->collCharts === null) {
-            $this->initCharts();
-            $this->collChartsPartial = true;
+        if ($this->collProductPlugins === null) {
+            $this->initProductPlugins();
+            $this->collProductPluginsPartial = true;
         }
-        if (!in_array($l, $this->collCharts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddChart($l);
+        if (!in_array($l, $this->collProductPlugins->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductPlugin($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	Chart $chart The chart object to add.
+     * @param	ProductPlugin $productPlugin The productPlugin object to add.
      */
-    protected function doAddChart($chart)
+    protected function doAddProductPlugin($productPlugin)
     {
-        $this->collCharts[]= $chart;
-        $chart->setOrganization($this);
+        $this->collProductPlugins[]= $productPlugin;
+        $productPlugin->setProduct($this);
     }
 
     /**
-     * @param	Chart $chart The chart object to remove.
-     * @return Organization The current object (for fluent API support)
+     * @param	ProductPlugin $productPlugin The productPlugin object to remove.
+     * @return Product The current object (for fluent API support)
      */
-    public function removeChart($chart)
+    public function removeProductPlugin($productPlugin)
     {
-        if ($this->getCharts()->contains($chart)) {
-            $this->collCharts->remove($this->collCharts->search($chart));
-            if (null === $this->chartsScheduledForDeletion) {
-                $this->chartsScheduledForDeletion = clone $this->collCharts;
-                $this->chartsScheduledForDeletion->clear();
+        if ($this->getProductPlugins()->contains($productPlugin)) {
+            $this->collProductPlugins->remove($this->collProductPlugins->search($productPlugin));
+            if (null === $this->productPluginsScheduledForDeletion) {
+                $this->productPluginsScheduledForDeletion = clone $this->collProductPlugins;
+                $this->productPluginsScheduledForDeletion->clear();
             }
-            $this->chartsScheduledForDeletion[]= $chart;
-            $chart->setOrganization(null);
+            $this->productPluginsScheduledForDeletion[]= clone $productPlugin;
+            $productPlugin->setProduct(null);
         }
 
         return $this;
@@ -1402,83 +1439,58 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Organization is new, it will return
-     * an empty collection; or if this Organization has previously
-     * been saved, it will retrieve related Charts from storage.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related ProductPlugins from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Organization.
+     * actually need in Product.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Chart[] List of Chart objects
+     * @return PropelObjectCollection|ProductPlugin[] List of ProductPlugin objects
      */
-    public function getChartsJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getProductPluginsJoinPlugin($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ChartQuery::create(null, $criteria);
-        $query->joinWith('User', $join_behavior);
+        $query = ProductPluginQuery::create(null, $criteria);
+        $query->joinWith('Plugin', $join_behavior);
 
-        return $this->getCharts($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Organization is new, it will return
-     * an empty collection; or if this Organization has previously
-     * been saved, it will retrieve related Charts from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Organization.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Chart[] List of Chart objects
-     */
-    public function getChartsJoinChartRelatedByForkedFrom($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChartQuery::create(null, $criteria);
-        $query->joinWith('ChartRelatedByForkedFrom', $join_behavior);
-
-        return $this->getCharts($query, $con);
+        return $this->getProductPlugins($query, $con);
     }
 
     /**
-     * Clears out the collUserOrganizations collection
+     * Clears out the collProductUsers collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Organization The current object (for fluent API support)
-     * @see        addUserOrganizations()
+     * @return Product The current object (for fluent API support)
+     * @see        addProductUsers()
      */
-    public function clearUserOrganizations()
+    public function clearProductUsers()
     {
-        $this->collUserOrganizations = null; // important to set this to null since that means it is uninitialized
-        $this->collUserOrganizationsPartial = null;
+        $this->collProductUsers = null; // important to set this to null since that means it is uninitialized
+        $this->collProductUsersPartial = null;
 
         return $this;
     }
 
     /**
-     * reset is the collUserOrganizations collection loaded partially
+     * reset is the collProductUsers collection loaded partially
      *
      * @return void
      */
-    public function resetPartialUserOrganizations($v = true)
+    public function resetPartialProductUsers($v = true)
     {
-        $this->collUserOrganizationsPartial = $v;
+        $this->collProductUsersPartial = $v;
     }
 
     /**
-     * Initializes the collUserOrganizations collection.
+     * Initializes the collProductUsers collection.
      *
-     * By default this just sets the collUserOrganizations collection to an empty array (like clearcollUserOrganizations());
+     * By default this just sets the collProductUsers collection to an empty array (like clearcollProductUsers());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1487,180 +1499,180 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initUserOrganizations($overrideExisting = true)
+    public function initProductUsers($overrideExisting = true)
     {
-        if (null !== $this->collUserOrganizations && !$overrideExisting) {
+        if (null !== $this->collProductUsers && !$overrideExisting) {
             return;
         }
-        $this->collUserOrganizations = new PropelObjectCollection();
-        $this->collUserOrganizations->setModel('UserOrganization');
+        $this->collProductUsers = new PropelObjectCollection();
+        $this->collProductUsers->setModel('ProductUser');
     }
 
     /**
-     * Gets an array of UserOrganization objects which contain a foreign key that references this object.
+     * Gets an array of ProductUser objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Organization is new, it will return
+     * If this Product is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|UserOrganization[] List of UserOrganization objects
+     * @return PropelObjectCollection|ProductUser[] List of ProductUser objects
      * @throws PropelException
      */
-    public function getUserOrganizations($criteria = null, PropelPDO $con = null)
+    public function getProductUsers($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collUserOrganizationsPartial && !$this->isNew();
-        if (null === $this->collUserOrganizations || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collUserOrganizations) {
+        $partial = $this->collProductUsersPartial && !$this->isNew();
+        if (null === $this->collProductUsers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductUsers) {
                 // return empty collection
-                $this->initUserOrganizations();
+                $this->initProductUsers();
             } else {
-                $collUserOrganizations = UserOrganizationQuery::create(null, $criteria)
-                    ->filterByOrganization($this)
+                $collProductUsers = ProductUserQuery::create(null, $criteria)
+                    ->filterByProduct($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collUserOrganizationsPartial && count($collUserOrganizations)) {
-                      $this->initUserOrganizations(false);
+                    if (false !== $this->collProductUsersPartial && count($collProductUsers)) {
+                      $this->initProductUsers(false);
 
-                      foreach($collUserOrganizations as $obj) {
-                        if (false == $this->collUserOrganizations->contains($obj)) {
-                          $this->collUserOrganizations->append($obj);
+                      foreach($collProductUsers as $obj) {
+                        if (false == $this->collProductUsers->contains($obj)) {
+                          $this->collProductUsers->append($obj);
                         }
                       }
 
-                      $this->collUserOrganizationsPartial = true;
+                      $this->collProductUsersPartial = true;
                     }
 
-                    $collUserOrganizations->getInternalIterator()->rewind();
-                    return $collUserOrganizations;
+                    $collProductUsers->getInternalIterator()->rewind();
+                    return $collProductUsers;
                 }
 
-                if($partial && $this->collUserOrganizations) {
-                    foreach($this->collUserOrganizations as $obj) {
+                if($partial && $this->collProductUsers) {
+                    foreach($this->collProductUsers as $obj) {
                         if($obj->isNew()) {
-                            $collUserOrganizations[] = $obj;
+                            $collProductUsers[] = $obj;
                         }
                     }
                 }
 
-                $this->collUserOrganizations = $collUserOrganizations;
-                $this->collUserOrganizationsPartial = false;
+                $this->collProductUsers = $collProductUsers;
+                $this->collProductUsersPartial = false;
             }
         }
 
-        return $this->collUserOrganizations;
+        return $this->collProductUsers;
     }
 
     /**
-     * Sets a collection of UserOrganization objects related by a one-to-many relationship
+     * Sets a collection of ProductUser objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $userOrganizations A Propel collection.
+     * @param PropelCollection $productUsers A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
-    public function setUserOrganizations(PropelCollection $userOrganizations, PropelPDO $con = null)
+    public function setProductUsers(PropelCollection $productUsers, PropelPDO $con = null)
     {
-        $userOrganizationsToDelete = $this->getUserOrganizations(new Criteria(), $con)->diff($userOrganizations);
+        $productUsersToDelete = $this->getProductUsers(new Criteria(), $con)->diff($productUsers);
 
-        $this->userOrganizationsScheduledForDeletion = unserialize(serialize($userOrganizationsToDelete));
+        $this->productUsersScheduledForDeletion = unserialize(serialize($productUsersToDelete));
 
-        foreach ($userOrganizationsToDelete as $userOrganizationRemoved) {
-            $userOrganizationRemoved->setOrganization(null);
+        foreach ($productUsersToDelete as $productUserRemoved) {
+            $productUserRemoved->setProduct(null);
         }
 
-        $this->collUserOrganizations = null;
-        foreach ($userOrganizations as $userOrganization) {
-            $this->addUserOrganization($userOrganization);
+        $this->collProductUsers = null;
+        foreach ($productUsers as $productUser) {
+            $this->addProductUser($productUser);
         }
 
-        $this->collUserOrganizations = $userOrganizations;
-        $this->collUserOrganizationsPartial = false;
+        $this->collProductUsers = $productUsers;
+        $this->collProductUsersPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related UserOrganization objects.
+     * Returns the number of related ProductUser objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related UserOrganization objects.
+     * @return int             Count of related ProductUser objects.
      * @throws PropelException
      */
-    public function countUserOrganizations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countProductUsers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collUserOrganizationsPartial && !$this->isNew();
-        if (null === $this->collUserOrganizations || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collUserOrganizations) {
+        $partial = $this->collProductUsersPartial && !$this->isNew();
+        if (null === $this->collProductUsers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductUsers) {
                 return 0;
             }
 
             if($partial && !$criteria) {
-                return count($this->getUserOrganizations());
+                return count($this->getProductUsers());
             }
-            $query = UserOrganizationQuery::create(null, $criteria);
+            $query = ProductUserQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByOrganization($this)
+                ->filterByProduct($this)
                 ->count($con);
         }
 
-        return count($this->collUserOrganizations);
+        return count($this->collProductUsers);
     }
 
     /**
-     * Method called to associate a UserOrganization object to this object
-     * through the UserOrganization foreign key attribute.
+     * Method called to associate a ProductUser object to this object
+     * through the ProductUser foreign key attribute.
      *
-     * @param    UserOrganization $l UserOrganization
-     * @return Organization The current object (for fluent API support)
+     * @param    ProductUser $l ProductUser
+     * @return Product The current object (for fluent API support)
      */
-    public function addUserOrganization(UserOrganization $l)
+    public function addProductUser(ProductUser $l)
     {
-        if ($this->collUserOrganizations === null) {
-            $this->initUserOrganizations();
-            $this->collUserOrganizationsPartial = true;
+        if ($this->collProductUsers === null) {
+            $this->initProductUsers();
+            $this->collProductUsersPartial = true;
         }
-        if (!in_array($l, $this->collUserOrganizations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddUserOrganization($l);
+        if (!in_array($l, $this->collProductUsers->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductUser($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	UserOrganization $userOrganization The userOrganization object to add.
+     * @param	ProductUser $productUser The productUser object to add.
      */
-    protected function doAddUserOrganization($userOrganization)
+    protected function doAddProductUser($productUser)
     {
-        $this->collUserOrganizations[]= $userOrganization;
-        $userOrganization->setOrganization($this);
+        $this->collProductUsers[]= $productUser;
+        $productUser->setProduct($this);
     }
 
     /**
-     * @param	UserOrganization $userOrganization The userOrganization object to remove.
-     * @return Organization The current object (for fluent API support)
+     * @param	ProductUser $productUser The productUser object to remove.
+     * @return Product The current object (for fluent API support)
      */
-    public function removeUserOrganization($userOrganization)
+    public function removeProductUser($productUser)
     {
-        if ($this->getUserOrganizations()->contains($userOrganization)) {
-            $this->collUserOrganizations->remove($this->collUserOrganizations->search($userOrganization));
-            if (null === $this->userOrganizationsScheduledForDeletion) {
-                $this->userOrganizationsScheduledForDeletion = clone $this->collUserOrganizations;
-                $this->userOrganizationsScheduledForDeletion->clear();
+        if ($this->getProductUsers()->contains($productUser)) {
+            $this->collProductUsers->remove($this->collProductUsers->search($productUser));
+            if (null === $this->productUsersScheduledForDeletion) {
+                $this->productUsersScheduledForDeletion = clone $this->collProductUsers;
+                $this->productUsersScheduledForDeletion->clear();
             }
-            $this->userOrganizationsScheduledForDeletion[]= clone $userOrganization;
-            $userOrganization->setOrganization(null);
+            $this->productUsersScheduledForDeletion[]= clone $productUser;
+            $productUser->setProduct(null);
         }
 
         return $this;
@@ -1670,25 +1682,25 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Organization is new, it will return
-     * an empty collection; or if this Organization has previously
-     * been saved, it will retrieve related UserOrganizations from storage.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related ProductUsers from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Organization.
+     * actually need in Product.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|UserOrganization[] List of UserOrganization objects
+     * @return PropelObjectCollection|ProductUser[] List of ProductUser objects
      */
-    public function getUserOrganizationsJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getProductUsersJoinUser($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = UserOrganizationQuery::create(null, $criteria);
+        $query = ProductUserQuery::create(null, $criteria);
         $query->joinWith('User', $join_behavior);
 
-        return $this->getUserOrganizations($query, $con);
+        return $this->getProductUsers($query, $con);
     }
 
     /**
@@ -1697,7 +1709,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      * @see        addProductOrganizations()
      */
     public function clearProductOrganizations()
@@ -1745,7 +1757,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Organization is new, it will return
+     * If this Product is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
@@ -1762,7 +1774,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 $this->initProductOrganizations();
             } else {
                 $collProductOrganizations = ProductOrganizationQuery::create(null, $criteria)
-                    ->filterByOrganization($this)
+                    ->filterByProduct($this)
                     ->find($con);
                 if (null !== $criteria) {
                     if (false !== $this->collProductOrganizationsPartial && count($collProductOrganizations)) {
@@ -1805,7 +1817,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      *
      * @param PropelCollection $productOrganizations A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setProductOrganizations(PropelCollection $productOrganizations, PropelPDO $con = null)
     {
@@ -1814,7 +1826,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
         $this->productOrganizationsScheduledForDeletion = unserialize(serialize($productOrganizationsToDelete));
 
         foreach ($productOrganizationsToDelete as $productOrganizationRemoved) {
-            $productOrganizationRemoved->setOrganization(null);
+            $productOrganizationRemoved->setProduct(null);
         }
 
         $this->collProductOrganizations = null;
@@ -1854,7 +1866,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             }
 
             return $query
-                ->filterByOrganization($this)
+                ->filterByProduct($this)
                 ->count($con);
         }
 
@@ -1866,7 +1878,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * through the ProductOrganization foreign key attribute.
      *
      * @param    ProductOrganization $l ProductOrganization
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function addProductOrganization(ProductOrganization $l)
     {
@@ -1887,12 +1899,12 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     protected function doAddProductOrganization($productOrganization)
     {
         $this->collProductOrganizations[]= $productOrganization;
-        $productOrganization->setOrganization($this);
+        $productOrganization->setProduct($this);
     }
 
     /**
      * @param	ProductOrganization $productOrganization The productOrganization object to remove.
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function removeProductOrganization($productOrganization)
     {
@@ -1903,7 +1915,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 $this->productOrganizationsScheduledForDeletion->clear();
             }
             $this->productOrganizationsScheduledForDeletion[]= clone $productOrganization;
-            $productOrganization->setOrganization(null);
+            $productOrganization->setProduct(null);
         }
 
         return $this;
@@ -1913,25 +1925,202 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Organization is new, it will return
-     * an empty collection; or if this Organization has previously
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
      * been saved, it will retrieve related ProductOrganizations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Organization.
+     * actually need in Product.
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|ProductOrganization[] List of ProductOrganization objects
      */
-    public function getProductOrganizationsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getProductOrganizationsJoinOrganization($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = ProductOrganizationQuery::create(null, $criteria);
-        $query->joinWith('Product', $join_behavior);
+        $query->joinWith('Organization', $join_behavior);
 
         return $this->getProductOrganizations($query, $con);
+    }
+
+    /**
+     * Clears out the collPlugins collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Product The current object (for fluent API support)
+     * @see        addPlugins()
+     */
+    public function clearPlugins()
+    {
+        $this->collPlugins = null; // important to set this to null since that means it is uninitialized
+        $this->collPluginsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collPlugins collection.
+     *
+     * By default this just sets the collPlugins collection to an empty collection (like clearPlugins());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initPlugins()
+    {
+        $this->collPlugins = new PropelObjectCollection();
+        $this->collPlugins->setModel('Plugin');
+    }
+
+    /**
+     * Gets a collection of Plugin objects related by a many-to-many relationship
+     * to the current object by way of the product_plugin cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Plugin[] List of Plugin objects
+     */
+    public function getPlugins($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collPlugins || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPlugins) {
+                // return empty collection
+                $this->initPlugins();
+            } else {
+                $collPlugins = PluginQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collPlugins;
+                }
+                $this->collPlugins = $collPlugins;
+            }
+        }
+
+        return $this->collPlugins;
+    }
+
+    /**
+     * Sets a collection of Plugin objects related by a many-to-many relationship
+     * to the current object by way of the product_plugin cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $plugins A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Product The current object (for fluent API support)
+     */
+    public function setPlugins(PropelCollection $plugins, PropelPDO $con = null)
+    {
+        $this->clearPlugins();
+        $currentPlugins = $this->getPlugins();
+
+        $this->pluginsScheduledForDeletion = $currentPlugins->diff($plugins);
+
+        foreach ($plugins as $plugin) {
+            if (!$currentPlugins->contains($plugin)) {
+                $this->doAddPlugin($plugin);
+            }
+        }
+
+        $this->collPlugins = $plugins;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Plugin objects related by a many-to-many relationship
+     * to the current object by way of the product_plugin cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Plugin objects
+     */
+    public function countPlugins($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collPlugins || null !== $criteria) {
+            if ($this->isNew() && null === $this->collPlugins) {
+                return 0;
+            } else {
+                $query = PluginQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collPlugins);
+        }
+    }
+
+    /**
+     * Associate a Plugin object to this object
+     * through the product_plugin cross reference table.
+     *
+     * @param  Plugin $plugin The ProductPlugin object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function addPlugin(Plugin $plugin)
+    {
+        if ($this->collPlugins === null) {
+            $this->initPlugins();
+        }
+        if (!$this->collPlugins->contains($plugin)) { // only add it if the **same** object is not already associated
+            $this->doAddPlugin($plugin);
+
+            $this->collPlugins[]= $plugin;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Plugin $plugin The plugin object to add.
+     */
+    protected function doAddPlugin($plugin)
+    {
+        $productPlugin = new ProductPlugin();
+        $productPlugin->setPlugin($plugin);
+        $this->addProductPlugin($productPlugin);
+    }
+
+    /**
+     * Remove a Plugin object to this object
+     * through the product_plugin cross reference table.
+     *
+     * @param Plugin $plugin The ProductPlugin object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function removePlugin(Plugin $plugin)
+    {
+        if ($this->getPlugins()->contains($plugin)) {
+            $this->collPlugins->remove($this->collPlugins->search($plugin));
+            if (null === $this->pluginsScheduledForDeletion) {
+                $this->pluginsScheduledForDeletion = clone $this->collPlugins;
+                $this->pluginsScheduledForDeletion->clear();
+            }
+            $this->pluginsScheduledForDeletion[]= $plugin;
+        }
+
+        return $this;
     }
 
     /**
@@ -1940,7 +2129,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      * @see        addUsers()
      */
     public function clearUsers()
@@ -1968,12 +2157,12 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
     /**
      * Gets a collection of User objects related by a many-to-many relationship
-     * to the current object by way of the user_organization cross-reference table.
+     * to the current object by way of the product_user cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Organization is new, it will return
+     * If this Product is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria Optional query object to filter the query
@@ -1989,7 +2178,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 $this->initUsers();
             } else {
                 $collUsers = UserQuery::create(null, $criteria)
-                    ->filterByOrganization($this)
+                    ->filterByProduct($this)
                     ->find($con);
                 if (null !== $criteria) {
                     return $collUsers;
@@ -2003,13 +2192,13 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
     /**
      * Sets a collection of User objects related by a many-to-many relationship
-     * to the current object by way of the user_organization cross-reference table.
+     * to the current object by way of the product_user cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
      * @param PropelCollection $users A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
     public function setUsers(PropelCollection $users, PropelPDO $con = null)
     {
@@ -2031,7 +2220,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
     /**
      * Gets the number of User objects related by a many-to-many relationship
-     * to the current object by way of the user_organization cross-reference table.
+     * to the current object by way of the product_user cross-reference table.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param boolean $distinct Set to true to force count distinct
@@ -2051,7 +2240,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                 }
 
                 return $query
-                    ->filterByOrganization($this)
+                    ->filterByProduct($this)
                     ->count($con);
             }
         } else {
@@ -2061,10 +2250,10 @@ abstract class BaseOrganization extends BaseObject implements Persistent
 
     /**
      * Associate a User object to this object
-     * through the user_organization cross reference table.
+     * through the product_user cross reference table.
      *
-     * @param  User $user The UserOrganization object to relate
-     * @return Organization The current object (for fluent API support)
+     * @param  User $user The ProductUser object to relate
+     * @return Product The current object (for fluent API support)
      */
     public function addUser(User $user)
     {
@@ -2085,17 +2274,17 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     protected function doAddUser($user)
     {
-        $userOrganization = new UserOrganization();
-        $userOrganization->setUser($user);
-        $this->addUserOrganization($userOrganization);
+        $productUser = new ProductUser();
+        $productUser->setUser($user);
+        $this->addProductUser($productUser);
     }
 
     /**
      * Remove a User object to this object
-     * through the user_organization cross reference table.
+     * through the product_user cross reference table.
      *
-     * @param User $user The UserOrganization object to relate
-     * @return Organization The current object (for fluent API support)
+     * @param User $user The ProductUser object to relate
+     * @return Product The current object (for fluent API support)
      */
     public function removeUser(User $user)
     {
@@ -2112,177 +2301,177 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collProducts collection
+     * Clears out the collOrganizations collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return Organization The current object (for fluent API support)
-     * @see        addProducts()
+     * @return Product The current object (for fluent API support)
+     * @see        addOrganizations()
      */
-    public function clearProducts()
+    public function clearOrganizations()
     {
-        $this->collProducts = null; // important to set this to null since that means it is uninitialized
-        $this->collProductsPartial = null;
+        $this->collOrganizations = null; // important to set this to null since that means it is uninitialized
+        $this->collOrganizationsPartial = null;
 
         return $this;
     }
 
     /**
-     * Initializes the collProducts collection.
+     * Initializes the collOrganizations collection.
      *
-     * By default this just sets the collProducts collection to an empty collection (like clearProducts());
+     * By default this just sets the collOrganizations collection to an empty collection (like clearOrganizations());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
      * @return void
      */
-    public function initProducts()
+    public function initOrganizations()
     {
-        $this->collProducts = new PropelObjectCollection();
-        $this->collProducts->setModel('Product');
+        $this->collOrganizations = new PropelObjectCollection();
+        $this->collOrganizations->setModel('Organization');
     }
 
     /**
-     * Gets a collection of Product objects related by a many-to-many relationship
+     * Gets a collection of Organization objects related by a many-to-many relationship
      * to the current object by way of the product_organization cross-reference table.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Organization is new, it will return
+     * If this Product is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param PropelPDO $con Optional connection object
      *
-     * @return PropelObjectCollection|Product[] List of Product objects
+     * @return PropelObjectCollection|Organization[] List of Organization objects
      */
-    public function getProducts($criteria = null, PropelPDO $con = null)
+    public function getOrganizations($criteria = null, PropelPDO $con = null)
     {
-        if (null === $this->collProducts || null !== $criteria) {
-            if ($this->isNew() && null === $this->collProducts) {
+        if (null === $this->collOrganizations || null !== $criteria) {
+            if ($this->isNew() && null === $this->collOrganizations) {
                 // return empty collection
-                $this->initProducts();
+                $this->initOrganizations();
             } else {
-                $collProducts = ProductQuery::create(null, $criteria)
-                    ->filterByOrganization($this)
+                $collOrganizations = OrganizationQuery::create(null, $criteria)
+                    ->filterByProduct($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    return $collProducts;
+                    return $collOrganizations;
                 }
-                $this->collProducts = $collProducts;
+                $this->collOrganizations = $collOrganizations;
             }
         }
 
-        return $this->collProducts;
+        return $this->collOrganizations;
     }
 
     /**
-     * Sets a collection of Product objects related by a many-to-many relationship
+     * Sets a collection of Organization objects related by a many-to-many relationship
      * to the current object by way of the product_organization cross-reference table.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $products A Propel collection.
+     * @param PropelCollection $organizations A Propel collection.
      * @param PropelPDO $con Optional connection object
-     * @return Organization The current object (for fluent API support)
+     * @return Product The current object (for fluent API support)
      */
-    public function setProducts(PropelCollection $products, PropelPDO $con = null)
+    public function setOrganizations(PropelCollection $organizations, PropelPDO $con = null)
     {
-        $this->clearProducts();
-        $currentProducts = $this->getProducts();
+        $this->clearOrganizations();
+        $currentOrganizations = $this->getOrganizations();
 
-        $this->productsScheduledForDeletion = $currentProducts->diff($products);
+        $this->organizationsScheduledForDeletion = $currentOrganizations->diff($organizations);
 
-        foreach ($products as $product) {
-            if (!$currentProducts->contains($product)) {
-                $this->doAddProduct($product);
+        foreach ($organizations as $organization) {
+            if (!$currentOrganizations->contains($organization)) {
+                $this->doAddOrganization($organization);
             }
         }
 
-        $this->collProducts = $products;
+        $this->collOrganizations = $organizations;
 
         return $this;
     }
 
     /**
-     * Gets the number of Product objects related by a many-to-many relationship
+     * Gets the number of Organization objects related by a many-to-many relationship
      * to the current object by way of the product_organization cross-reference table.
      *
      * @param Criteria $criteria Optional query object to filter the query
      * @param boolean $distinct Set to true to force count distinct
      * @param PropelPDO $con Optional connection object
      *
-     * @return int the number of related Product objects
+     * @return int the number of related Organization objects
      */
-    public function countProducts($criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countOrganizations($criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        if (null === $this->collProducts || null !== $criteria) {
-            if ($this->isNew() && null === $this->collProducts) {
+        if (null === $this->collOrganizations || null !== $criteria) {
+            if ($this->isNew() && null === $this->collOrganizations) {
                 return 0;
             } else {
-                $query = ProductQuery::create(null, $criteria);
+                $query = OrganizationQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
 
                 return $query
-                    ->filterByOrganization($this)
+                    ->filterByProduct($this)
                     ->count($con);
             }
         } else {
-            return count($this->collProducts);
+            return count($this->collOrganizations);
         }
     }
 
     /**
-     * Associate a Product object to this object
+     * Associate a Organization object to this object
      * through the product_organization cross reference table.
      *
-     * @param  Product $product The ProductOrganization object to relate
-     * @return Organization The current object (for fluent API support)
+     * @param  Organization $organization The ProductOrganization object to relate
+     * @return Product The current object (for fluent API support)
      */
-    public function addProduct(Product $product)
+    public function addOrganization(Organization $organization)
     {
-        if ($this->collProducts === null) {
-            $this->initProducts();
+        if ($this->collOrganizations === null) {
+            $this->initOrganizations();
         }
-        if (!$this->collProducts->contains($product)) { // only add it if the **same** object is not already associated
-            $this->doAddProduct($product);
+        if (!$this->collOrganizations->contains($organization)) { // only add it if the **same** object is not already associated
+            $this->doAddOrganization($organization);
 
-            $this->collProducts[]= $product;
+            $this->collOrganizations[]= $organization;
         }
 
         return $this;
     }
 
     /**
-     * @param	Product $product The product object to add.
+     * @param	Organization $organization The organization object to add.
      */
-    protected function doAddProduct($product)
+    protected function doAddOrganization($organization)
     {
         $productOrganization = new ProductOrganization();
-        $productOrganization->setProduct($product);
+        $productOrganization->setOrganization($organization);
         $this->addProductOrganization($productOrganization);
     }
 
     /**
-     * Remove a Product object to this object
+     * Remove a Organization object to this object
      * through the product_organization cross reference table.
      *
-     * @param Product $product The ProductOrganization object to relate
-     * @return Organization The current object (for fluent API support)
+     * @param Organization $organization The ProductOrganization object to relate
+     * @return Product The current object (for fluent API support)
      */
-    public function removeProduct(Product $product)
+    public function removeOrganization(Organization $organization)
     {
-        if ($this->getProducts()->contains($product)) {
-            $this->collProducts->remove($this->collProducts->search($product));
-            if (null === $this->productsScheduledForDeletion) {
-                $this->productsScheduledForDeletion = clone $this->collProducts;
-                $this->productsScheduledForDeletion->clear();
+        if ($this->getOrganizations()->contains($organization)) {
+            $this->collOrganizations->remove($this->collOrganizations->search($organization));
+            if (null === $this->organizationsScheduledForDeletion) {
+                $this->organizationsScheduledForDeletion = clone $this->collOrganizations;
+                $this->organizationsScheduledForDeletion->clear();
             }
-            $this->productsScheduledForDeletion[]= $product;
+            $this->organizationsScheduledForDeletion[]= $organization;
         }
 
         return $this;
@@ -2320,13 +2509,13 @@ abstract class BaseOrganization extends BaseObject implements Persistent
     {
         if ($deep && !$this->alreadyInClearAllReferencesDeep) {
             $this->alreadyInClearAllReferencesDeep = true;
-            if ($this->collCharts) {
-                foreach ($this->collCharts as $o) {
+            if ($this->collProductPlugins) {
+                foreach ($this->collProductPlugins as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collUserOrganizations) {
-                foreach ($this->collUserOrganizations as $o) {
+            if ($this->collProductUsers) {
+                foreach ($this->collProductUsers as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2335,13 +2524,18 @@ abstract class BaseOrganization extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collPlugins) {
+                foreach ($this->collPlugins as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collUsers) {
                 foreach ($this->collUsers as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collProducts) {
-                foreach ($this->collProducts as $o) {
+            if ($this->collOrganizations) {
+                foreach ($this->collOrganizations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2349,26 +2543,30 @@ abstract class BaseOrganization extends BaseObject implements Persistent
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
-        if ($this->collCharts instanceof PropelCollection) {
-            $this->collCharts->clearIterator();
+        if ($this->collProductPlugins instanceof PropelCollection) {
+            $this->collProductPlugins->clearIterator();
         }
-        $this->collCharts = null;
-        if ($this->collUserOrganizations instanceof PropelCollection) {
-            $this->collUserOrganizations->clearIterator();
+        $this->collProductPlugins = null;
+        if ($this->collProductUsers instanceof PropelCollection) {
+            $this->collProductUsers->clearIterator();
         }
-        $this->collUserOrganizations = null;
+        $this->collProductUsers = null;
         if ($this->collProductOrganizations instanceof PropelCollection) {
             $this->collProductOrganizations->clearIterator();
         }
         $this->collProductOrganizations = null;
+        if ($this->collPlugins instanceof PropelCollection) {
+            $this->collPlugins->clearIterator();
+        }
+        $this->collPlugins = null;
         if ($this->collUsers instanceof PropelCollection) {
             $this->collUsers->clearIterator();
         }
         $this->collUsers = null;
-        if ($this->collProducts instanceof PropelCollection) {
-            $this->collProducts->clearIterator();
+        if ($this->collOrganizations instanceof PropelCollection) {
+            $this->collOrganizations->clearIterator();
         }
-        $this->collProducts = null;
+        $this->collOrganizations = null;
     }
 
     /**
@@ -2378,7 +2576,7 @@ abstract class BaseOrganization extends BaseObject implements Persistent
      */
     public function __toString()
     {
-        return (string) $this->exportTo(OrganizationPeer::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProductPeer::DEFAULT_STRING_FORMAT);
     }
 
     /**
