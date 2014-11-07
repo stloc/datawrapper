@@ -1135,34 +1135,9 @@ dw.utils = {
     },
 
     getMaxChartHeight: function(el) {
-        function margin(el, type) {
-            if ($(el).css('margin-' + type) == 'auto') return 0;
-            return +$(el).css('margin-' + type).replace('px', '');
-        }
-        var ch = 0, bottom = 0; // summed height of children, 10px for top & bottom margin
-        $('body > *').each(function(i, el) {
-            var t = el.tagName.toLowerCase();
-            if (t != 'script' && el.id != 'chart' && !$(el).hasClass('tooltip') &&
-                !$(el).hasClass('qtip') && !$(el).hasClass('container') &&
-                !$(el).hasClass('noscript')) {
-                ch += $(el).outerHeight(false); // element height
-            }
-            ch += Math.max(margin(el, 'top'), bottom);
-            bottom = margin(el, 'bottom');
-        });
-        ch += bottom;
-        // subtract body padding
-        //ch += $('body').innerHeight() - $('body').height();
-        var mt = $('#chart').css('margin-top').replace('px', ''),
-            mb = $('#chart').css('margin-bottom').replace('px', ''),
-            // FIXME: -8 instead of -2 because when `introduction` is filled, a scrollbar appears.
-            // Should be dynamic.
-            maxH = $(window).height() - ch - 8;
-        // IE Fix
-        if (!$.support.leadingWhitespace) maxH -= 15;
-        maxH -= $('body').css('padding-top').replace('px', '');
-        maxH -= $('body').css('padding-bottom').replace('px', '');
-        return maxH;
+        return $(window).height() -
+            $('.dw-chart-header').outerHeight(true) -
+            $('.dw-chart-footer').outerHeight(true);
     },
 
     /*

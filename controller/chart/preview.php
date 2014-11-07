@@ -15,7 +15,9 @@ $app->get('/chart/:id/preview/?', function ($id) use ($app) {
         $page['plain'] = $app->request()->get('plain') == 1;
         $page['fullscreen'] = $app->request()->get('fs') == 1;
         $page['innersvg'] = $app->request()->get('innersvg') == 1;
-        $app->render('chart.twig', $page);
+
+
+        $app->render('plugins/theme-default/default.twig', $page);
     });
 });
 

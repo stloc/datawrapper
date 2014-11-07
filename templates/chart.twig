@@ -37,23 +37,26 @@
 {% endfor %}
 
 </head>
-<body class="chart{% if fullscreen %} fullscreen{% endif %}{% if plain %} plain{% endif %} theme-{{ chart.theme }} vis-{{ chart.type }}">
+<body class="dw-chart dw-chart-iframe chart{% if fullscreen %} fullscreen{% endif %}{% if plain %} plain{% endif %} theme-{{ chart.theme }} dw-theme-{{ chart.theme }} vis-{{ chart.type }} dw-vis-{{ chart.type }}">
 
     {# some convenient short cuts for theme templates #}
     {% set title = chart.title %}{% set intro = chart.metadata.describe.intro %}{% set source = chart.metadata.describe['source-name'] %}{% set sourceURL = chart.metadata.describe['source-url'] %}
 
-
-    {% include theme.template ? theme.template : 'plugins/theme-default/default.twig' %}
-
-    {# <div class="noscript" style="position: absolute;top: 0;left: 0;z-index: -10;">
-        <a href="static.html"><img src="nojs.png" alt="{% trans "Please activate JavaScript to see the interactive chart." %}" /></a>
+    <div class="dw-chart-header">
+        {% block chart_header %}{% endblock %}
     </div>
-    <div class="noscript" style="height:95%;position:absolute;top:0;width:98%;z-index:10;overflow:hidden">
-        <div style="position:relative;top:50%;text-align:center;font-size:18px;padding:0 20px"><a style="color: rgba(0,0,0,.2); text-shadow: 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff, 0 0 7px #fff; text-decoration: none;" href="static.html" >{% trans "Please activate JavaScript to see the interactive chart." %}</a></div>
-    </div>#}
+
+
+    <div class="dw-chart-body"></div>
+
+    <div class="dw-chart-footer">
+        {% block chart_footer %}{% endblock %}
+    </div>
+
+
     <script type="text/javascript">
 
-    if (document.getElementsByTagName('script').length > 0) $('body').addClass('js');
+    if (document.getElementsByTagName('script').length > 0) $('dw-chart').addClass('dw-chart-js');
 
     __dw.init({
         chartJSON: JSON.parse('{{ chart.toJSON | raw }}'),

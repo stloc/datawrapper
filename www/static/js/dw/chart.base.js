@@ -22,8 +22,8 @@
         }
 
         // compute chart dimensions
-        var w = $('#chart').innerWidth(),
-            h = dw.utils.getMaxChartHeight($('#chart'));
+        var w = $('.dw-chart').innerWidth(),
+            h = dw.utils.getMaxChartHeight($('.dw-chart-iframe'));
 
         if (!$.support.leadingWhitespace) w -= 10; // IE Fix
         w -= $('body').css('padding-left').replace('px', '');
@@ -53,7 +53,7 @@
                     encodeURIComponent(chart.dataset().toCSV()));
         }
 
-        chart.render($('#chart'));
+        chart.render($('.dw-chart-body'));
     }
 
     function chartLoaded() {

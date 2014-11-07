@@ -58,6 +58,8 @@
                 scales.y = scales.y.nice();
             }
 
+            console.log(c.tpad, c.bpad);
+
             scales.x = scales.x.range([c.lpad + c.lpad2, c.w-c.rpad]);
             scales.y = scales.y.range(invertYAxis ? [c.tpad, c.h-c.bpad] : [c.h-c.bpad, c.tpad]);
 
@@ -131,6 +133,7 @@
             function initMargins() {
                 c = vis.initCanvas({
                     h: h,
+                    tpad: 20,
                     bpad: vis.get('rotate-x-labels') ? bpad + 20 : bpad
                 });
 
