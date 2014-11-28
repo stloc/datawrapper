@@ -26,3 +26,5 @@ vendor/*
 scripts/lib/execute_jobs.lock
 
 scripts/execute_jobs.lock
+test.sh
+.idea

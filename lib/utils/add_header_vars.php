@@ -17,6 +17,7 @@ function add_header_vars(&$page, $active = null, $page_css = null) {
     // define the header links
     global $app;
     $config = $GLOBALS['dw_config'];
+    //var_dump($config);die;
     if (!isset($active)) {
         $active = explode('/', $app->request()->getResourceUri());
         $active = $active[1];

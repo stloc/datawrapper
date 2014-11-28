@@ -121,11 +121,17 @@ a img { border:0px; }
     z-index: 1100;
     /* Sets the background here to propagate it to its children */
     background:transparent;
+    margin-top: 10px;
 }
 
+#footer .logo-telegramme {
+    height: 20px;
+    display: block;
+}
 
 #footer .footer-left {
     bottom:0;
+    font-size: 9px;
     /* Vertical text align */
 }
 
@@ -136,6 +142,7 @@ within the .toggleable-panel */
     position: absolute;
     bottom: 0;
     right: 0;
+    font-size: 14px;
 }
 
 .footer-right .toggle-panel {
@@ -149,7 +156,7 @@ within the .toggleable-panel */
 
 /* Add a comma after the source block */
 .toggleable-panel .source-block:after {
-    content:","
+    /*content:","*/
 }
 
 /* This oiverlay cover the body when the toggleable panel is open */
