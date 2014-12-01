@@ -12,7 +12,6 @@ body, html {
 a { color: #0088CC; }
 
 body.chart {
-    font-family: Helvetica Neue, Arial;
     font-weight: 400;
     font-size: 12px;
     margin: 0 5px;

@@ -9,7 +9,12 @@ html body.chart.fullscreen {
     width: 100%;
     background: #fff;
     overflow: hidden;
+    font-family: 'Source Sans Pro', sans-serif;
 }
+html body {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
 
 #header {
     min-height: 1px;
@@ -33,6 +38,17 @@ html body.chart.fullscreen {
     left:0;
     right:0;
     height: 25px;
+}
+
+h1 span.chart-title {
+    margin-bottom: 10px;
+    clear: both;
+    color: #333;
+    line-height: 0.95em;
+    font-weight: bold;
+    font-size: 16px !important;
+    display: initial !important;
+    letter-spacing: 0 !important;
 }
 
 .fullscreen h1 {

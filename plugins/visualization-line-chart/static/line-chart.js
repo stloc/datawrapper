@@ -518,7 +518,8 @@
                         y = c.h - c.bpad + theme.lineChart.xLabelOffset,
                         lbl = tickFormat(date);
                     if (fmt == 'YYYY' && i > 0 && i < ticks.length-1) {
-                        lbl = '’'+String(date.getFullYear()).substr(2);
+                        //lbl = '’'+String(date.getFullYear()).substr(2);
+                        lbl = date.getFullYear();
                     }
                     var l = vis.label(x, y, lbl, { align: 'center', cl: 'axis x-axis'});
                     if (
