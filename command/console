@@ -1,0 +1,28 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Created by Laurent GUIGO
+ * Date: 02/12/14
+ * Time: 09:44
+ */
+require_once __DIR__.'/../vendor/autoload.php';
+
+use command\ChartPublishCommand;
+use Symfony\Component\Console\Application;
+
+
+
+
+define('DATAWRAPPER_VERSION', '1.7.11');  // must match with package.json
+
+define('ROOT_PATH', '../');
+$GLOBALS['dw_config'] = $dw_config = Spyc::YAMLLoad(ROOT_PATH . 'config.yaml');
+
+
+Propel::init(ROOT_PATH . "lib/core/build/conf/datawrapper-conf.php");
+
+
+
+$app = new Application();
+$app->add(new ChartPublishCommand);
+$app->run();

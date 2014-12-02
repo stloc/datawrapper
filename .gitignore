@@ -26,5 +26,6 @@ vendor/*
 scripts/lib/execute_jobs.lock
 
 scripts/execute_jobs.lock
+composer.lock
 test.sh
 .idea

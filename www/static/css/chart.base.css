@@ -40,6 +40,25 @@ html body {
     height: 25px;
 }
 
+#footer_tlg {
+    overflow: auto;
+    margin-top: 10px;
+    height: 55px;
+}
+#footer_tlg .credit {
+    float: left;
+    color: grey;
+    font-size: 10px;
+}
+
+#footer_tlg .credit_tlg {
+    float: right;
+}
+#footer_tlg img.logo-telegramme {
+    display: block;
+    width: 120px;
+}
+
 h1 span.chart-title {
     margin-bottom: 10px;
     clear: both;
