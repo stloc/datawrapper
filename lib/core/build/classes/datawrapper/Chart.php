@@ -347,7 +347,7 @@ class Chart extends BaseChart {
      * return URL of this chart on Datawrapper
      */
     public function getLocalUrl() {
-        return 'http://' . $GLOBALS['dw_config']['chart_domain'] . '/' . $this->getID() . '/index.html';
+        return 'https://' . $GLOBALS['dw_config']['chart_domain'] . '/' . $this->getID() . '/index.html';
     }
 
     public function getCDNPath($version = null) {
